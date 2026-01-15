@@ -38,6 +38,14 @@ button { padding: 12px 24px; font-size: 16px; cursor: pointer; margin: 5px; }
 </section>
 
 <button
+  aria-label="Look around the barn. Take a moment to scan the dusty corners and shadowed spaces of this old structure. Something might be hiding in the hay."
+  onclick="document.getElementById('discovered').innerHTML = '<button aria-label=\'A small grey mouse scurries across the floor carrying an old brass key in its mouth. The key glints in the afternoon light. Perhaps it unlocks something important.\' onclick=\'alert(\\\'You go to get the mouse but it runs out the back window. You chase after it!\\\'); window.location.href=\\\'level3.html\\\'\'>Chase the Mouse</button>'; this.disabled = true; this.innerText = 'You spot something moving...';">
+  Look Around the Barn
+</button>
+
+<div id="discovered" style="margin-top: 10px;"></div>
+
+<button
   aria-label="Climb to the hayloft. The wooden stairs creak welcomingly beneath your feet as you ascend. Above, more discoveries await among the stored hay and forgotten treasures of the farm's past."
   onclick="window.location.href='level3.html'">
   Climb to Hayloft
