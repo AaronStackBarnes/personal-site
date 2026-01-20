@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kilter Board Room</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a2e;
+      color: #fff;
+      overflow: hidden;
+    }
+    #container {
+      width: 100vw;
+      height: 100vh;
+    }
+    #info {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 100;
+    }
+    #info h1 {
+      font-size: 24px;
+      color: #00b4d8;
+      margin-bottom: 4px;
+    }
+    #info p {
+      font-size: 14px;
+      color: #888;
+    }
+    #info p.highlight {
+      color: #ff6b35;
+    }
+    #controls {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 100;
+    }
+    #controls button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    #controls button.primary {
+      background: #ff6b35;
+      color: #fff;
+    }
+    #controls button.secondary {
+      background: #333;
+      color: #fff;
+    }
+    #controls button:hover {
+      opacity: 0.8;
+    }
+    #instructions {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(0,0,0,0.5);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      z-index: 100;
+    }
+    #instructions p {
+      margin: 4px 0;
+      color: #aaa;
+    }
+    #instructions span {
+      color: #fff;
+    }
+    #legend {
+      position: absolute;
+      bottom: 80px;
+      right: 16px;
+      background: rgba(0,0,0,0.5);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      z-index: 100;
+    }
+    #legend .item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 4px 0;
+    }
+    #legend .color-box {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+
+  <div id="info">
+    <h1>Kilter Board Room</h1>
+    <p>Room: 13'8" × 16'6" × 8'3"</p>
+    <p class="highlight">Board: 10' × 10' @ 40° overhang (right wall)</p>
+  </div>
+
+  <div id="instructions">
+    <p>🖱 <span>Drag to rotate</span></p>
+    <p>🤏 <span>Pinch/scroll to zoom</span></p>
+    <p>🖐 <span>Two-finger drag to pan</span></p>
+  </div>
+
+  <div id="legend">
+    <div class="item"><div class="color-box" style="background: #ff6b35;"></div> Kilter Board</div>
+    <div class="item"><div class="color-box" style="background: #4a90a4;"></div> Walls</div>
+    <div class="item"><div class="color-box" style="background: #5a9ab4;"></div> Window</div>
+    <div class="item"><div class="color-box" style="background: #2a3a4a;"></div> Floor</div>
+    <div class="item"><div class="color-box" style="background: rgba(100,120,140,0.3);"></div> Entry (open)</div>
+    <div class="item"><div class="color-box" style="background: #888888;"></div> Squat Rack</div>
+  </div>
+
+  <div id="controls">
+    <button class="primary" onclick="setView('outside')">Outside</button>
+    <button class="secondary" onclick="setView('inside')">Inside</button>
+    <button class="secondary" onclick="setView('top')">Top</button>
+    <button class="secondary" onclick="setView('reset')">Reset</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <script>
+    // ============================================
+    // CONFIGURATION
+    // ============================================
+
+    // Room dimensions in inches
+    const ROOM = {
+      width: 164,      // 13' 8"
+      height: 99,      // 8' 3"
+      depth: 198,      // 16' 6"
+    };
+
+    // Kilter Board configuration
+    const KILTER = {
+      width: 120,           // 10 feet (horizontal width along wall)
+      hypotenuse: 120,      // 10 feet (climbing surface length)
+      angle: 40,            // degrees from vertical (overhang angle)
+    };
+    const kilterAngleRad = KILTER.angle * Math.PI / 180;
+
+    // Calculate vertical height of tilted board
+    const kilterVerticalHeight = KILTER.hypotenuse * Math.cos(kilterAngleRad);
+
+    // ============================================
+    // SCENE SETUP
+    // ============================================
+
+    const container = document.getElementById('container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a1a2e);
+
+    const camera = new THREE.PerspectiveCamera(
+      50,
+      window.innerWidth / window.innerHeight,
+      1,
+      2000
+    );
+    camera.position.set(250, 180, 350);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.target.set(0, ROOM.height / 2, 0);
+    controls.update();
+
+    // ============================================
+    // MATERIALS
+    // ============================================
+
+    const wallMaterial = new THREE.MeshBasicMaterial({
+      color: 0x4a90a4,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.3,
+    });
+
+    const wallEdgeMaterial = new THREE.LineBasicMaterial({
+      color: 0x6ab4c8,
+    });
+
+    const floorMaterial = new THREE.MeshBasicMaterial({
+      color: 0x2a3a4a,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.5,
+    });
+
+    const floorEdgeMaterial = new THREE.LineBasicMaterial({
+      color: 0x4a6a7a,
+    });
+
+    const windowMaterial = new THREE.MeshBasicMaterial({
+      color: 0x5a9ab4,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.4,
+    });
+
+    const kilterMaterial = new THREE.MeshBasicMaterial({
+      color: 0xff6b35,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.7,
+    });
+
+    const kilterEdgeMaterial = new THREE.LineBasicMaterial({
+      color: 0xff8c5a,
+    });
+
+    const entryMaterial = new THREE.MeshBasicMaterial({
+      color: 0x64788c,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.1,
+    });
+
+    const entryEdgeMaterial = new THREE.LineBasicMaterial({
+      color: 0x64788c,
+      transparent: true,
+      opacity: 0.5,
+    });
+
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
+
+    function createWall(width, height, material) {
+      const geometry = new THREE.PlaneGeometry(width, height);
+      const mesh = new THREE.Mesh(geometry, material);
+      const edges = new THREE.EdgesGeometry(geometry);
+      const lines = new THREE.LineSegments(edges, wallEdgeMaterial);
+      const group = new THREE.Group();
+      group.add(mesh);
+      group.add(lines);
+      return group;
+    }
+
+    function createFloor(width, depth, material) {
+      const geometry = new THREE.PlaneGeometry(width, depth);
+      const mesh = new THREE.Mesh(geometry, material);
+      const edges = new THREE.EdgesGeometry(geometry);
+      const lines = new THREE.LineSegments(edges, floorEdgeMaterial);
+      const group = new THREE.Group();
+      group.add(mesh);
+      group.add(lines);
+      return group;
+    }
+
+    // ============================================
+    // BUILD ROOM
+    // ============================================
+
+    const room = new THREE.Group();
+
+    // Back wall
+    const backWall = createWall(ROOM.width, ROOM.height, wallMaterial);
+    backWall.position.set(0, ROOM.height / 2, -ROOM.depth / 2);
+    room.add(backWall);
+
+    // Left wall
+    const leftWall = createWall(ROOM.depth, ROOM.height, wallMaterial);
+    leftWall.rotation.y = Math.PI / 2;
+    leftWall.position.set(-ROOM.width / 2, ROOM.height / 2, 0);
+    room.add(leftWall);
+
+    // Right wall
+    const rightWall = createWall(ROOM.depth, ROOM.height, wallMaterial);
+    rightWall.rotation.y = -Math.PI / 2;
+    rightWall.position.set(ROOM.width / 2, ROOM.height / 2, 0);
+    room.add(rightWall);
+
+    // Floor
+    const floor = createFloor(ROOM.width, ROOM.depth, floorMaterial);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.set(0, 0, 0);
+    room.add(floor);
+
+    // Ceiling (dashed lines only)
+    const ceilingGeom = new THREE.PlaneGeometry(ROOM.width, ROOM.depth);
+    const ceilingEdges = new THREE.EdgesGeometry(ceilingGeom);
+    const ceilingLines = new THREE.LineSegments(
+      ceilingEdges,
+      new THREE.LineDashedMaterial({ color: 0x6ab4c8, dashSize: 6, gapSize: 4 })
+    );
+    ceilingLines.computeLineDistances();
+    ceilingLines.rotation.x = -Math.PI / 2;
+    ceilingLines.position.set(0, ROOM.height, 0);
+    room.add(ceilingLines);
+
+    // Window on back wall
+    const windowWidth = 36;
+    const windowHeight = 36;
+    const windowGeom = new THREE.PlaneGeometry(windowWidth, windowHeight);
+    const windowMesh = new THREE.Mesh(windowGeom, windowMaterial);
+    const windowEdges = new THREE.EdgesGeometry(windowGeom);
+    const windowLines = new THREE.LineSegments(windowEdges, new THREE.LineBasicMaterial({ color: 0x7abacc }));
+    const windowGroup = new THREE.Group();
+    windowGroup.add(windowMesh);
+    windowGroup.add(windowLines);
+    // No rotation needed - back wall faces forward by default
+    windowGroup.position.set(-ROOM.width / 4, ROOM.height / 2 + 10, -ROOM.depth / 2 + 0.5);
+    room.add(windowGroup);
+
+    // Entry (open front) - just outline
+    const entryGeom = new THREE.PlaneGeometry(ROOM.width, ROOM.height);
+    const entryMesh = new THREE.Mesh(entryGeom, entryMaterial);
+    const entryEdges = new THREE.EdgesGeometry(entryGeom);
+    const entryLines = new THREE.LineSegments(entryEdges, entryEdgeMaterial);
+    const entryGroup = new THREE.Group();
+    entryGroup.add(entryMesh);
+    entryGroup.add(entryLines);
+    entryGroup.position.set(0, ROOM.height / 2, ROOM.depth / 2);
+    room.add(entryGroup);
+
+    // ============================================
+    // KILTER BOARD
+    // ============================================
+
+    // Pivot group sits at floor/wall junction
+    const kilterPivot = new THREE.Group();
+
+    // Board offset so BOTTOM edge is at pivot origin
+    const kilterGeom = new THREE.PlaneGeometry(KILTER.width, KILTER.hypotenuse);
+    const kilterMesh = new THREE.Mesh(kilterGeom, kilterMaterial);
+    kilterMesh.position.y = KILTER.hypotenuse / 2;  // Shift UP so bottom edge is at pivot
+    kilterPivot.add(kilterMesh);
+
+    // Edge outline
+    const kilterEdges = new THREE.EdgesGeometry(kilterGeom);
+    const kilterLines = new THREE.LineSegments(kilterEdges, kilterEdgeMaterial);
+    kilterLines.position.y = KILTER.hypotenuse / 2;
+    kilterPivot.add(kilterLines);
+
+    // Rotation: face into room, then tilt top into room (overhang)
+    kilterPivot.rotation.order = 'YXZ';
+    kilterPivot.rotation.y = Math.PI / 2;      // Face into room from right wall
+    kilterPivot.rotation.x = -kilterAngleRad;  // Negative tilts TOP into room (overhang)
+
+    // Position pivot at floor against right wall, flush with front edge
+    // Y position calculated so top of board touches ceiling
+    kilterPivot.position.set(
+      ROOM.width / 2 - 0.5,                                      // Slight inset from right wall
+      ROOM.height - kilterVerticalHeight,                        // Position so top touches ceiling
+      ROOM.depth / 2 - KILTER.width / 2                          // Front edge, offset by half board width
+    );
+
+    room.add(kilterPivot);
+
+    // ============================================
+    // SQUAT RACK (back left corner)
+    // ============================================
+
+    const RACK = {
+      width: 45,      // 45" wide
+      depth: 49.5,    // 49.5" deep
+      height: 90,     // ~7.5' tall (typical rack height)
+    };
+
+    const rackMaterial = new THREE.MeshBasicMaterial({
+      color: 0x888888,
+      transparent: true,
+      opacity: 0.5,
+    });
+
+    const rackEdgeMaterial = new THREE.LineBasicMaterial({
+      color: 0xaaaaaa,
+    });
+
+    // Create rack as a box (just edges for cleaner look)
+    const rackGeom = new THREE.BoxGeometry(RACK.width, RACK.height, RACK.depth);
+    const rackMesh = new THREE.Mesh(rackGeom, rackMaterial);
+    const rackEdges = new THREE.EdgesGeometry(rackGeom);
+    const rackLines = new THREE.LineSegments(rackEdges, rackEdgeMaterial);
+
+    const rackGroup = new THREE.Group();
+    rackGroup.add(rackMesh);
+    rackGroup.add(rackLines);
+
+    // Position in back left corner (1.5 feet off walls)
+    rackGroup.position.set(
+      -ROOM.width / 2 + RACK.width / 2 + 18,    // Left side, 1.5 feet from wall
+      RACK.height / 2,                           // Sitting on floor
+      -ROOM.depth / 2 + RACK.depth / 2 + 18     // Back wall, 1.5 feet from wall
+    );
+
+    room.add(rackGroup);
+
+    // ============================================
+    // DIMENSION LABELS
+    // ============================================
+
+    function createLabel(text, color = '#ff6b35') {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 256;
+      canvas.height = 64;
+      ctx.fillStyle = color;
+      ctx.font = 'bold 32px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, 128, 32);
+
+      const texture = new THREE.CanvasTexture(canvas);
+      const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+      const sprite = new THREE.Sprite(spriteMaterial);
+      sprite.scale.set(64, 16, 1);
+      return sprite;
+    }
+
+    // Room dimension labels
+    const widthLabel = createLabel("13' 8\"", '#ff6b35');
+    widthLabel.position.set(0, -20, ROOM.depth / 2 + 30);
+    room.add(widthLabel);
+
+    const depthLabel = createLabel("16' 6\"", '#6ab4c8');
+    depthLabel.position.set(ROOM.width / 2 + 40, -20, 0);
+    room.add(depthLabel);
+
+    const heightLabel = createLabel("8' 3\"", '#6ab4c8');
+    heightLabel.position.set(ROOM.width / 2 + 40, ROOM.height / 2, ROOM.depth / 2);
+    room.add(heightLabel);
+
+    // Kilter board label
+    const kilterLabel = createLabel("10' × 10' @ 40°", '#ff6b35');
+    kilterLabel.position.set(
+      ROOM.width / 2 - KILTER.hypotenuse * Math.sin(kilterAngleRad) / 2 - 20,
+      ROOM.height - kilterVerticalHeight / 2,
+      ROOM.depth / 2 - KILTER.width / 2
+    );
+    room.add(kilterLabel);
+
+    // Board height off ground label
+    const boardFloorGap = ROOM.height - kilterVerticalHeight;
+    const gapFeet = Math.floor(boardFloorGap / 12);
+    const gapInches = Math.round(boardFloorGap % 12);
+    const gapText = gapFeet > 0 ? `${gapFeet}' ${gapInches}"` : `${gapInches}"`;
+    const gapLabel = createLabel(gapText, '#ffcc00');
+    gapLabel.position.set(
+      ROOM.width / 2 + 30,
+      boardFloorGap / 2,
+      ROOM.depth / 2 - KILTER.width / 2
+    );
+    room.add(gapLabel);
+
+    // Squat rack label
+    const rackLabel = createLabel("49.5\" × 45\"", '#aaaaaa');
+    rackLabel.position.set(
+      -ROOM.width / 2 + RACK.width / 2 + 18,
+      RACK.height + 15,
+      -ROOM.depth / 2 + RACK.depth / 2 + 18
+    );
+    room.add(rackLabel);
+
+    scene.add(room);
+
+    // ============================================
+    // GRID HELPER
+    // ============================================
+
+    const gridHelper = new THREE.GridHelper(400, 20, 0x444444, 0x333333);
+    gridHelper.position.y = -1;
+    scene.add(gridHelper);
+
+    // ============================================
+    // CAMERA VIEWS
+    // ============================================
+
+    function setView(view) {
+      switch(view) {
+        case 'outside':
+          camera.position.set(250, 180, 350);
+          controls.target.set(0, ROOM.height / 2, 0);
+          break;
+        case 'inside':
+          camera.position.set(0, ROOM.height / 2, ROOM.depth / 3);
+          controls.target.set(0, ROOM.height / 2, -ROOM.depth / 2);
+          break;
+        case 'top':
+          camera.position.set(0, 400, 0);
+          controls.target.set(0, 0, 0);
+          break;
+        case 'reset':
+          camera.position.set(250, 180, 350);
+          controls.target.set(0, ROOM.height / 2, 0);
+          break;
+      }
+      controls.update();
+    }
+
+    // ============================================
+    // ANIMATION LOOP
+    // ============================================
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // ============================================
+    // RESIZE HANDLER
+    // ============================================
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
