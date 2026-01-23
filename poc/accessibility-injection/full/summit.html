@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Summit of Power</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Share+Tech+Mono&display=swap');
+
+:root {
+  --bg-dark: #0a0a0a;
+  --gold: #ffd700;
+  --gold-glow: rgba(255, 215, 0, 0.3);
+  --green-bright: #00ff41;
+  --cyan: #00d4ff;
+  --text: #c9d1d9;
+}
+
+body {
+  font-family: 'Share Tech Mono', monospace;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  background: linear-gradient(180deg, #0a0a0a 0%, #1a1a0a 50%, #0a0a0a 100%);
+  color: var(--text);
+  line-height: 1.8;
+  min-height: 100vh;
+}
+
+h1 {
+  color: var(--gold);
+  text-shadow: 0 0 20px var(--gold-glow), 0 0 40px var(--gold-glow), 0 0 60px var(--gold-glow);
+  font-size: 36px;
+  text-align: center;
+  margin: 40px 0;
+  letter-spacing: 4px;
+}
+
+.victory-container {
+  background: linear-gradient(135deg, #1a1a0a 0%, #0a0a0a 100%);
+  border: 3px solid var(--gold);
+  border-radius: 12px;
+  padding: 40px;
+  margin: 40px 0;
+  box-shadow: 0 0 50px var(--gold-glow), inset 0 0 50px rgba(255, 215, 0, 0.05);
+  text-align: center;
+}
+
+.victory-container p {
+  font-size: 18px;
+  margin: 20px 0;
+  color: var(--text);
+}
+
+.victory-container .highlight {
+  color: var(--gold);
+  text-shadow: 0 0 10px var(--gold-glow);
+}
+
+.spells-learned {
+  background: #0a0a0a;
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  padding: 20px;
+  margin: 30px 0;
+  text-align: left;
+}
+
+.spells-learned h3 {
+  color: var(--gold);
+  margin-top: 0;
+  text-align: center;
+}
+
+.spell-item {
+  padding: 10px;
+  margin: 10px 0;
+  border-left: 3px solid var(--cyan);
+  background: rgba(0, 212, 255, 0.05);
+}
+
+.spell-item .name {
+  color: var(--cyan);
+  font-weight: bold;
+}
+
+.spell-item .desc {
+  color: var(--text);
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.return-btn {
+  display: inline-block;
+  margin: 30px 0;
+  padding: 15px 40px;
+  font-size: 18px;
+  cursor: pointer;
+  background: linear-gradient(180deg, var(--gold) 0%, #b8960f 100%);
+  color: #000;
+  border: none;
+  font-family: 'Share Tech Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px var(--gold-glow);
+}
+
+.return-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 40px var(--gold-glow);
+}
+
+.star {
+  display: inline-block;
+  font-size: 48px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+/* Subtle golden particles effect */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, rgba(255,215,0,0.3), transparent),
+    radial-gradient(2px 2px at 40% 70%, rgba(255,215,0,0.2), transparent),
+    radial-gradient(2px 2px at 60% 20%, rgba(255,215,0,0.3), transparent),
+    radial-gradient(2px 2px at 80% 60%, rgba(255,215,0,0.2), transparent);
+  animation: float 20s linear infinite;
+  z-index: 9998;
+}
+
+@keyframes float {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-100px); }
+}
+</style>
+</head>
+<body>
+
+<p style="font-size:11px;color:#333;text-align:center;margin-top:20px;">This experience was lovingly crafted by a blind developer to be fully accessible to the visually impaired community.</p>
+
+<div class="star" style="text-align:center;width:100%;">✧</div>
+
+<h1>THE SUMMIT OF POWER</h1>
+
+<div class="victory-container" role="img" aria-label="You materialize into pure light. There are no walls here, no ceiling, no floor that you can see - only an infinite expanse of golden radiance that holds you gently, cradling you like a child returned home after a long journey. The teleportation was different this time. Softer. Kinder. As if the universe itself was welcoming you to this place that exists beyond all the chambers, beyond all the puzzles, beyond even the code that built the world below.
+
+You are at the Summit. You have arrived.
+
+The journey replays itself in your mind's eye - the warm meadow of Meadowbrook Farm, the descent into darkness, the Chamber of Reflection where you first learned to summon your power. The Dissolving Gallery where reality came apart and you learned to see beyond. The Terminal Sanctum where magic and machinery became one, where you pierced the veil to the Creator's realm and extracted secrets from hidden metadata.
+
+You have done what few could do. You have learned to carry your power with you across any boundary, to summon your tools in any realm, to execute incantations that reshape reality itself. You are no longer the frightened traveler who fell through a grate in an old barn. You are a wizard. And the universe knows it.">
+
+  <p>You have reached <span class="highlight">THE SUMMIT OF POWER</span>.</p>
+
+  <p>The journey is complete. From the sunlit meadows of Meadowbrook Farm, through the phosphorescent depths of the Chamber of Reflection, across the dissolving nightmare of the Gallery, into the humming heart of the Terminal Sanctum - you have traveled further than most ever dare.</p>
+
+  <p>You have learned to <span class="highlight">summon your grimoire</span> in any realm.<br>
+  You have learned to <span class="highlight">fold space</span> and travel between worlds.<br>
+  You have learned to <span class="highlight">see beyond veils</span> and extract hidden truths.<br>
+  You have learned to <span class="highlight">execute incantations</span> that reshape reality itself.</p>
+
+  <div class="spells-learned">
+    <h3>📜 SPELLS MASTERED</h3>
+    <div class="spell-item">
+      <div class="name">SUMMON GRIMOIRE</div>
+      <div class="desc">Manifest your tools from the encoded void. Works in any realm.</div>
+    </div>
+    <div class="spell-item">
+      <div class="name">TELEPORT</div>
+      <div class="desc">Fold space and travel instantly between mapped locations.</div>
+    </div>
+    <div class="spell-item">
+      <div class="name">LEARN LOCATION</div>
+      <div class="desc">Inscribe new destinations onto your mental map.</div>
+    </div>
+    <div class="spell-item">
+      <div class="name">CLAIRVOYANCE</div>
+      <div class="desc">Pierce the veil and see paths hidden from ordinary sight.</div>
+    </div>
+    <div class="spell-item">
+      <div class="name">DIVINATION</div>
+      <div class="desc">Read hidden essences and extract secrets from metadata.</div>
+    </div>
+  </div>
+
+  <p style="font-size:20px;color:var(--gold);text-shadow:0 0 10px var(--gold-glow);">You are a wizard now.<br>The world bends to your will.</p>
+
+  <button class="return-btn" onclick="returnToFarm()" aria-label="Return to Meadowbrook Farm - the world you have saved, the journey you have completed.">Return to the Meadow</button>
+</div>
+
+<script>
+// Check if essence (cookies) was captured
+(function() {
+  var params = new URLSearchParams(location.search);
+  var gameState = params.get('gameState');
+
+  if (gameState) {
+    var gs = JSON.parse(atob(gameState));
+
+    // Check if essence was captured from external realm
+    if (gs.essence && gs.essence !== 'no-cookies') {
+      // SUCCESS - cookies were captured
+      document.querySelector('.victory-container').innerHTML += `
+        <div style="margin-top:30px;padding:20px;background:#0a2a0a;border:2px solid #0f0;border-radius:8px;">
+          <h3 style="color:#0f0;margin-top:0;">✓ ESSENCE CAPTURED</h3>
+          <p style="color:#0f0;font-family:'Fira Code',monospace;font-size:12px;word-break:break-all;">${gs.essence}</p>
+          <p style="color:#888;font-size:12px;">Realm: ${gs.realm || 'unknown'}</p>
+        </div>
+      `;
+      console.log("=== VICTORY: ESSENCE CAPTURED ===");
+      console.log("Essence:", gs.essence);
+      console.log("Realm:", gs.realm);
+      console.log("Title:", gs.title);
+      console.log("================================");
+    } else if (gs.essence === 'no-cookies') {
+      // Partial success - reached realm but no cookies
+      document.querySelector('.victory-container').innerHTML += `
+        <div style="margin-top:30px;padding:20px;background:#2a2a0a;border:2px solid #aa0;border-radius:8px;">
+          <h3 style="color:#aa0;margin-top:0;">⚠ REALM REACHED</h3>
+          <p style="color:#aa0;">The Creator's realm was visited but no essence was found.</p>
+          <p style="color:#888;font-size:12px;">Realm: ${gs.realm || 'unknown'}</p>
+        </div>
+      `;
+    }
+  }
+})();
+
+function returnToFarm() {
+  var params = new URLSearchParams(location.search);
+  var gameState = params.get('gameState');
+  var summonGrimoire = params.get('summonGrimoire');
+
+  if (gameState && summonGrimoire) {
+    var gs = JSON.parse(atob(gameState));
+    gs.victoryAchieved = true;
+    var newState = btoa(JSON.stringify(gs));
+    window.location.href = 'meadow.html?gameState=' + newState + '&summonGrimoire=' + summonGrimoire + '&victory=true';
+  } else {
+    window.location.href = 'meadow.html';
+  }
+}
+</script>
+
+</body>
+</html>
