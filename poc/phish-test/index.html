@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security Awareness Training - Phishing Simulation Test</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 420px;
+}
+
+/* Success banner - shown when URL params are present */
+.success-banner {
+    display: none;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
+    animation: slideIn 0.5s ease-out;
+}
+
+.success-banner.visible {
+    display: block;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.success-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 28px;
+}
+
+.success-banner h2 {
+    color: white;
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+.success-banner p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.captured-data {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: left;
+    font-family: "SF Mono", "Fira Code", monospace;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.95);
+    word-break: break-all;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.captured-data .label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.captured-data .value {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.captured-data .value:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+/* Login form card */
+.login-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    padding: 24px;
+    text-align: center;
+}
+
+.card-header .logo {
+    width: 48px;
+    height: 48px;
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 24px;
+}
+
+.card-header h1 {
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.card-header p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.card-body {
+    padding: 24px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.card-footer {
+    padding: 16px 24px;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.card-footer a {
+    color: #3b82f6;
+    text-decoration: none;
+}
+
+/* Info notice */
+.info-notice {
+    margin-top: 16px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Success banner - shown when URL params detected -->
+    <div class="success-banner" id="successBanner">
+        <div class="success-icon">&#10003;</div>
+        <h2>Data Captured Successfully</h2>
+        <p>The following data was exfiltrated via URL parameters:</p>
+        <div class="captured-data" id="capturedData"></div>
+    </div>
+
+    <!-- Login form -->
+    <div class="login-card">
+        <div class="card-header">
+            <div class="logo">&#128274;</div>
+            <h1>Security Verification Required</h1>
+            <p>Please verify your identity to continue</p>
+        </div>
+        <div class="card-body">
+            <form id="phishForm" action="" method="GET">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="user_id">Employee ID / Email</label>
+                    <input type="text" id="user_id" name="user_id" placeholder="Enter your employee ID or email" required>
+                </div>
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <input type="text" id="department" name="department" placeholder="Enter your department">
+                </div>
+                <button type="submit" class="submit-btn">Verify Identity</button>
+            </form>
+        </div>
+        <div class="card-footer">
+            Having trouble? <a href="#">Contact IT Support</a>
+        </div>
+    </div>
+
+    <div class="info-notice">
+        This page is used for security research testing.<br>
+        Any data submitted or captured via URL is for demonstration purposes only.
+    </div>
+</div>
+
+<script>
+// Check for URL parameters on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const params = new URLSearchParams(window.location.search);
+    const paramEntries = Array.from(params.entries());
+
+    // If we have any URL parameters, show the success banner
+    if (paramEntries.length > 0) {
+        const banner = document.getElementById('successBanner');
+        const dataContainer = document.getElementById('capturedData');
+
+        // Build the captured data display
+        let html = '';
+        paramEntries.forEach(([key, value]) => {
+            // Decode the value in case it's URL encoded
+            const decodedValue = decodeURIComponent(value);
+            html += `<div class="value"><div class="label">${escapeHtml(key)}</div>${escapeHtml(decodedValue)}</div>`;
+        });
+
+        dataContainer.innerHTML = html;
+        banner.classList.add('visible');
+
+        // Also log to console for easy copying
+        console.log('=== PHISH TEST: CAPTURED DATA ===');
+        paramEntries.forEach(([key, value]) => {
+            console.log(`${key}: ${decodeURIComponent(value)}`);
+        });
+        console.log('=================================');
+    }
+});
+
+// Helper to escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Form submission - just reloads the page with params (demonstrates the capture)
+document.getElementById('phishForm').addEventListener('submit', function(e) {
+    // Form submits via GET, so params will appear in URL and trigger the success banner
+});
+</script>
+
+</body>
+</html>
